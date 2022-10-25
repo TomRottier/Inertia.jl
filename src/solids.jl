@@ -1,0 +1,53 @@
+# regular solids and their inertial properties
+abstract type AbstractSolid end
+
+## cuboid
+struct Cuboid{T} <: AbstractSolid
+    length::T
+    width::T
+    height::T
+    mass::T
+    moi::SMatrix{3,T} # principle inertia tensor
+
+    # determine moment of inertia from dimensions and mass
+    function Cuboid{T}(l, w, h, m) where {T}
+        c = 1 / 12 * m
+        I = @SMatrix [c*(w^2+h^2) 0 0; 0 c*(l^2+h^2) 0; 0 0 c*(l^2+w^2)]
+
+        return new{T}(l, w, h, m, I)
+    end
+end
+
+## sphere
+struct Sphere{T} <: AbstractSolid
+    radius::T
+    mass::T
+    moi::SMatrix{3,T} # principle inertia tensor
+
+    # determine moment of inertia from dimensions and mass
+    function Sphere{T}(r, m) where {T}
+        c = 2 / 5 * m
+        I = @SMatrix [c*r^2 0 0; 0 c*r^2 0; 0 0 c*r^2]
+
+        return new{T}(r, m, I)
+    end
+end
+
+## cylinder
+struct Cylinder{T} <: AbstractSolid
+    radius::T
+    length::T
+    mass::T
+    moi::SMatrix{3,T} # principle inertia tensor
+
+    # determine moment of inertia from dimensions and mass
+    function Cylinder{T}(r, l, m) where {T}
+        c1 = 1 / 12 * m
+        c2 = 1 / 2 * m
+        I = @SMatrix [c2*r^2 0 0; 0 c1*(3r^2+l^2) 0; 0 0 c1*(3r^2+l^2)]
+
+        return new{T}(r, l, m, I)
+    end
+end
+
+
