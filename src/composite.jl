@@ -23,7 +23,7 @@ sum_inertia(I...) = sum(I)
 # centre of mass
 centre_of_mass(ms, rs) = reduce(+, ms .* rs) / sum(ms)
 
-centre_of_mass(solids::Vector{AbstractSolid}, rs) = centre_of_mass(getfield.(solids, :mass), rs)
+centre_of_mass(solids::Vector{T}, rs) where {T<:AbstractSolid} = centre_of_mass(getfield.(solids, :mass), rs)
 
 # calculate total inertia of collection of solids about a point p
 function calculate_inertia(Is, Rs, ms, rs, p)
@@ -32,7 +32,7 @@ function calculate_inertia(Is, Rs, ms, rs, p)
 
     for (I, R, m, r) in zip(Is, Rs, ms, rs)
         # inertia about axes parallel to global frame
-        I′ = R * I * R'
+        I′ = rotated_inertia(I, R')
 
         # inertia about com
         I′cm = parallel_axis(I′, m, p - r)
@@ -46,6 +46,18 @@ end
 # total inertia about CoM
 calculate_inertia(Is, Rs, ms, rs) = calculate_inertia(Is, Rs, ms, rs, centre_of_mass(ms, rs))
 
-calculate_inertia(solids::Vector{AbstractSolid}, Rs, rs, p) = begin
+"""
+Calculate the combined inertia of a collection of rigid bodies about a point.
+
+- `solids`: vector of solids.
+- `Rs`: vector of rotation matricies for the rotation from the global frame to the body-fixed frame.
+- `rs`: vector of positions of each solids centre of mass.
+- `p`: point about which inertia is calculated. If omitted defaults to the centre of mass of the system.
+"""
+calculate_inertia(solids::Vector{T}, Rs, rs, p) where {T<:AbstractSolid} = begin
     calculate_inertia(getfield.(solids, :moi), Rs, getfield.(solids, :mass), rs, p)
+end
+
+calculate_inertia(solids::Vector{T}, Rs, rs) where {T<:AbstractSolid} = begin
+    calculate_inertia(getfield.(solids, :moi), Rs, getfield.(solids, :mass), rs)
 end
