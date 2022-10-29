@@ -1,5 +1,5 @@
 # Inertia.jl
-Julia package for calculating inertia parameters geometric solids.
+Julia package for calculating inertia of geometric solids.
 
 ## Installation
 ```julia
