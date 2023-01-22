@@ -5,20 +5,20 @@ using StaticArrays
 
     @testset "cuboid" verbose = true begin
         cuboid = Cuboid(1.0, 2.0, 3.0, 0.1)
-        @test isapprox(cuboid.moi, @SMatrix [0.10833 0 0; 0 0.08333 0; 0 0 0.04167]; atol=1e-5)
+        @test isapprox(moi(cuboid), @SMatrix [0.10833 0 0; 0 0.08333 0; 0 0 0.04167]; atol=1e-5)
 
     end
 
     @testset "sphere" verbose = true begin
         sphere = Sphere(1.0, 1.0)
-        @test isapprox(sphere.moi, @SMatrix [0.4 0 0; 0 0.4 0; 0 0 0.4]; atol=1e-5)
+        @test isapprox(moi(sphere), @SMatrix [0.4 0 0; 0 0.4 0; 0 0 0.4]; atol=1e-5)
 
     end
 
 
     @testset "cylinder" verbose = true begin
         cylinder = Cylinder(0.1, 2.3, 3.5)
-        @test isapprox(cylinder.moi, @SMatrix [0.0175 0 0; 0 1.5517 0; 0 0 1.5517]; atol=1e-4)
+        @test isapprox(moi(cylinder), @SMatrix [0.0175 0 0; 0 1.5517 0; 0 0 1.5517]; atol=1e-4)
 
     end
 
@@ -49,26 +49,26 @@ end
     end
 
     @testset "parallel axis" verbose = true begin
-        @test Inertia.parallel_axis(cuboid1, [0, 0, 0]) == cuboid1.moi
-        @test Inertia.parallel_axis(cuboid1, [1, 1, 1]) == cuboid1.moi + m * [2 -1 -1; -1 2 -1; -1 -1 2]
+        @test Inertia.parallel_axis(cuboid1, [0, 0, 0]) == moi(cuboid1)
+        @test Inertia.parallel_axis(cuboid1, [1, 1, 1]) == moi(cuboid1) + m * [2 -1 -1; -1 2 -1; -1 -1 2]
 
     end
 
     @testset "rotate inertia" verbose = true begin
         R = [1 0 0; 0 0 -1; 0 1 0] # rotates 90 degrees about x axis
-        @test Inertia.rotated_inertia(cuboid1.moi, R') == Cuboid(l, h, w, m).moi
+        @test Inertia.rotated_inertia(moi(cuboid1), R') == moi(Cuboid(l, h, w, m))
 
     end
 
     @testset "moment of inertia" verbose = true begin
         Rs = fill([1 0 0; 0 1 0; 0 0 1], 2)
-        moi = calculate_inertia(solids, Rs, rs)
-        @test moi == Cuboid(2l, w, h, 2m).moi
+        __moi = calculate_inertia(solids, Rs, rs)
+        @test __moi == moi(Cuboid(2l, w, h, 2m))
 
         R = [1 0 0; 0 0 -1; 0 1 0] # rotates 90 degrees about x axis
         Rs = fill(R, 2)
-        moi = calculate_inertia(solids, Rs, rs)
-        @test moi == Cuboid(2l, h, w, 2m).moi
+        __moi = calculate_inertia(solids, Rs, rs)
+        @test __moi == moi(Cuboid(2l, h, w, 2m))
 
 
     end

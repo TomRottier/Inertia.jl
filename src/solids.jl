@@ -2,45 +2,66 @@
 abstract type AbstractSolid end
 
 ## cuboid
-struct Cuboid{T} <: AbstractSolid
+struct Cuboid{T<:Real} <: AbstractSolid
     length::T
     width::T
     height::T
     mass::T
-    moi::SMatrix{3,3,T,9} # principle inertia tensor
+    Ixx::T
+    Iyy::T
+    Izz::T
+    Ixy::T
+    Iyz::T
+    Izx::T
 end
 
 # determine moment of inertia from dimensions and mass
 function Cuboid(l, w, h, m)
     c = 1 / 12 * m
     I = @SMatrix [c*(w^2+h^2) 0 0; 0 c*(l^2+h^2) 0; 0 0 c*(l^2+w^2)]
+    Ixx = c * (w^2 + h^2)
+    Iyy = c * (l^2 + h^2)
+    Izz = c * (l^2 + w^2)
+    Ixy = Iyz = Izx = zero(l)
 
-    return Cuboid(l, w, h, m, I)
+    return Cuboid(l, w, h, m, Ixx, Iyy, Izz, Ixy, Iyz, Izx)
 end
 
 
 ## sphere
-struct Sphere{T} <: AbstractSolid
+struct Sphere{T<:Real} <: AbstractSolid
     radius::T
     mass::T
-    moi::SMatrix{3,3,T,9} # principle inertia tensor
+    Ixx::T
+    Iyy::T
+    Izz::T
+    Ixy::T
+    Iyz::T
+    Izx::T
 end
 
 # determine moment of inertia from dimensions and mass
 function Sphere(r, m)
     c = 2 / 5 * m
     I = @SMatrix [c*r^2 0 0; 0 c*r^2 0; 0 0 c*r^2]
+    Ixx = Iyy = Izz = c * r^2
+    Ixy = Iyz = Izx = zero(r)
 
-    return Sphere(r, m, I)
+    return Sphere(r, m, Ixx, Iyy, Izz, Ixy, Iyz, Izx)
 end
 
 
 ## cylinder
-struct Cylinder{T} <: AbstractSolid
+struct Cylinder{T<:Real} <: AbstractSolid
     radius::T
     length::T
     mass::T
-    moi::SMatrix{3,3,T,9} # principle inertia tensor
+    Ixx::T
+    Iyy::T
+    Izz::T
+    Ixy::T
+    Iyz::T
+    Izx::T
 end
 
 # determine moment of inertia from dimensions and mass
@@ -48,8 +69,11 @@ function Cylinder(r, l, m)
     c1 = 1 / 12 * m
     c2 = 1 / 2 * m
     I = @SMatrix [c2*r^2 0 0; 0 c1*(3r^2+l^2) 0; 0 0 c1*(3r^2+l^2)]
+    Ixx = c2 * r^2
+    Iyy = Izz = c1 * (3r^2 + l^2)
+    Ixy = Iyz = Izx = zero(r)
 
-    return Cylinder(r, l, m, I)
+    return Cylinder(r, l, m, Ixx, Iyy, Izz, Ixy, Iyz, Izx)
 end
 
 

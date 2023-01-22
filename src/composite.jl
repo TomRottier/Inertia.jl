@@ -15,7 +15,7 @@ function parallel_axis(I, m, p)
     return [Ixx Ixy Ixz; Iyx Iyy Iyz; Izx Izy Izz]
 end
 
-parallel_axis(solid::AbstractSolid, p) = parallel_axis(solid.moi, solid.mass, p)
+parallel_axis(solid::AbstractSolid, p) = parallel_axis(moi(solid), solid.mass, p)
 
 # sum inertia
 sum_inertia(I...) = sum(I)
@@ -55,9 +55,9 @@ Calculate the combined inertia of a collection of rigid bodies about a point.
 - `p`: point about which inertia is calculated. If omitted defaults to the centre of mass of the system.
 """
 calculate_inertia(solids::Vector{T}, Rs, rs, p) where {T<:AbstractSolid} = begin
-    calculate_inertia(getfield.(solids, :moi), Rs, getfield.(solids, :mass), rs, p)
+    calculate_inertia(moi.(solids), Rs, mass.(solids), rs, p)
 end
 
 calculate_inertia(solids::Vector{T}, Rs, rs) where {T<:AbstractSolid} = begin
-    calculate_inertia(getfield.(solids, :moi), Rs, getfield.(solids, :mass), rs)
+    calculate_inertia(moi.(solids), Rs, mass.(solids), rs)
 end
