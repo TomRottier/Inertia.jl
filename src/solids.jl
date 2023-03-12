@@ -18,7 +18,6 @@ end
 # determine moment of inertia from dimensions and mass
 function Cuboid(l, w, h, m)
     c = 1 / 12 * m
-    I = @SMatrix [c*(w^2+h^2) 0 0; 0 c*(l^2+h^2) 0; 0 0 c*(l^2+w^2)]
     Ixx = c * (w^2 + h^2)
     Iyy = c * (l^2 + h^2)
     Izz = c * (l^2 + w^2)
@@ -43,7 +42,6 @@ end
 # determine moment of inertia from dimensions and mass
 function Sphere(r, m)
     c = 2 / 5 * m
-    I = @SMatrix [c*r^2 0 0; 0 c*r^2 0; 0 0 c*r^2]
     Ixx = Iyy = Izz = c * r^2
     Ixy = Iyz = Izx = zero(r)
 
@@ -68,7 +66,6 @@ end
 function Cylinder(r, l, m)
     c1 = 1 / 12 * m
     c2 = 1 / 2 * m
-    I = @SMatrix [c2*r^2 0 0; 0 c1*(3r^2+l^2) 0; 0 0 c1*(3r^2+l^2)]
     Ixx = c2 * r^2
     Iyy = Izz = c1 * (3r^2 + l^2)
     Ixy = Iyz = Izx = zero(r)
